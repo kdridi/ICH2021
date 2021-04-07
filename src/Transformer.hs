@@ -4,10 +4,11 @@ module Transformer
     
 import Data.List (sort)
 
-import Pixel ( Pixel, ColorF )
+import Pixel ( Pixel(..), Position(Position), ColorF, Image(..) )
 
-transformPixels :: [(ColorF, [Pixel])] -> [Pixel]
-transformPixels = foldl tr []
+transformPixels :: [(ColorF, [Pixel])] -> Image
+transformPixels arr = Image w h p
   where
-    tr :: [Pixel] -> (ColorF, [Pixel]) -> [Pixel]
-    tr ps1 (c, ps2) = ps1 ++ ps2
+    w = let Pixel (Position _ j) _ = last p in j + 1
+    h = let Pixel (Position i _) _ = last p in i + 1
+    p = sort $ concatMap snd arr

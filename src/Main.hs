@@ -16,8 +16,7 @@ main = do
       mapM_ print pixels
     [txtFilePath,pngFilePath] -> do
       cluster <- parseFile txtFilePath
-      let pixels = transformPixels cluster
-      mapM_ print pixels
-      writeImageFile pixels pngFilePath
+      let image = transformPixels cluster
+      writeImageFile image pngFilePath
     _ -> error "Command not found"
 

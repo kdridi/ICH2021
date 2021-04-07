@@ -19,13 +19,13 @@ import Pixel ( Pixel(..), Position(..), Color(..) )
 readImageFile :: String -> IO [Pixel]
 readImageFile ifn = do
   e <- doesFileExist ifn
-  case e of
-    False -> fail $ "ERROR: " ++ ifn ++ " doesn't exists"
-    True -> do
-      e <- return . (\a -> JP.decodePng a <|> JP.decodeJpeg a) =<< BS.readFile ifn
-      case e of
-        Left msg -> fail $ "ERROR: " ++ msg
-        Right img -> return $ imagePixels img
+  if e then do
+    e <- (\a -> JP.decodePng a <|> JP.decodeJpeg a) <$> BS.readFile ifn
+    case e of
+      Left msg -> fail $ "ERROR: " ++ msg
+      Right img -> return $ imagePixels img
+  else
+    fail $ "ERROR: " ++ ifn ++ " doesn't exists"
 
 imagePixels :: JP.DynamicImage -> [Pixel]
 imagePixels (JP.ImageY8     i) = pixels $ JP.pixelMap (JP.promotePixel :: JP.Pixel8  -> JP.PixelRGB8 ) i
@@ -56,30 +56,26 @@ class ImageGetColors a where
 
 instance ImageGetColors JP.PixelRGB8 where
   getColor (JP.Image w _ d) (Position i j) =
-    let r:g:b:[] = VS.toList
-                 $ VS.map fromIntegral
-                 $ VS.take 3
-                 $ VS.drop (3 * (j + i * w)) d
+    let [r,g,b] = VS.toList
+                $ VS.map fromIntegral
+                $ VS.take 3
+                $ VS.drop (3 * (j + i * w)) d
     in Color r g b
 
 instance ImageGetColors JP.PixelRGB16 where
   getColor (JP.Image w _ d) (Position i j) =
-    let r:g:b:[] = VS.toList
-                 $ VS.map (`quot` 256)
-                 $ VS.map fromIntegral
-                 $ VS.take 3
-                 $ VS.drop (3 * (j + i * w)) d
+    let [r,g,b] = VS.toList
+                $ VS.map (`quot` 256)
+                $ VS.map fromIntegral
+                $ VS.take 3
+                $ VS.drop (3 * (j + i * w)) d
     in Color r g b
 
 instance ImageGetColors JP.PixelRGBF where
   getColor (JP.Image w _ d) (Position i j) =
-    let r:g:b:[] = VS.toList
-                 $ VS.map round
-                 $ VS.map (* 256)
-                 $ VS.take 3
-                 $ VS.drop (3 * (j + i * w)) d
+    let [r,g,b] = VS.toList
+                $ VS.map round
+                $ VS.map (* 256)
+                $ VS.take 3
+                $ VS.drop (3 * (j + i * w)) d
     in Color r g b
-    
-
-
-

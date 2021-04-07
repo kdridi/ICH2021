@@ -49,3 +49,5 @@ instance Eq Pixel where
   
 instance Ord Pixel where
   compare (Pixel p0 _) (Pixel p1 _) = compare p0 p1
+
+data Image = Image Int Int [Pixel]
