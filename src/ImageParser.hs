@@ -4,10 +4,9 @@ module ImageParser
     
 import System.Directory (doesFileExist)
     
-import ImageReader
-import Pixel
+import Pixel ( Pixel(..), Position(..), Color(..), ColorF(..) )
 
-import Text.Parsec.String
+import Text.Parsec.String ( parseFromFile, Parser )
 
 import Text.ParserCombinators.Parsec.Char (char, digit, string, spaces)
 import Text.ParserCombinators.Parsec.Combinator (many1, between)
@@ -16,13 +15,13 @@ import Text.ParserCombinators.Parsec.Prim (many)
 parseFile :: String -> IO [(ColorF, [Pixel])]
 parseFile f = do
   e <- doesFileExist f
-  case e of
-    False -> fail $ "ERROR: " ++ f ++ " doesn't exists"
-    True -> do
-      e <- parseFromFile pOUT f
-      case e of
-        Left msg -> fail $ "ERROR: " ++ (show msg)
-        Right img -> return img
+  if e then do
+    e <- parseFromFile pOUT f
+    case e of
+      Left msg -> fail $ "ERROR: " ++ show msg
+      Right img -> return img
+  else
+    fail $ "ERROR: " ++ f ++ " doesn't exists"
 
 pOUT :: Parser [(ColorF, [Pixel])]
 pOUT = many pCLUSTER

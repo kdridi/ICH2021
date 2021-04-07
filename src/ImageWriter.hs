@@ -2,14 +2,14 @@ module ImageWriter
   ( writeImageFile
   ) where
 
-import Data.List
+import Data.Maybe ( fromMaybe )
 
 import qualified Data.Vector.Storable as VS
 import qualified Codec.Picture.Types as JP
 import qualified Codec.Picture.Png as JP
 import qualified Codec.Picture.Tga as JP
 
-import Pixel
+import Pixel ( Pixel(..), Position(..), Color(..) )
 
 writeImageFile :: [Pixel] -> String -> IO ()
 writeImageFile pixels = writeImage
@@ -33,7 +33,7 @@ writeImageFile pixels = writeImage
     colors = concatMap colorAt positions
     
     colorAt :: Position -> [Int]
-    colorAt p = let (Color r g b) = maybe (error "Color Not Found") id color in [r, g, b]
+    colorAt p = let (Color r g b) = fromMaybe (error "Color Not Found") color in [r, g, b]
       where
         color :: Maybe Color
         color = foldl get Nothing pixels
@@ -43,4 +43,4 @@ writeImageFile pixels = writeImage
         get c _ = c
 
 checkExtension :: String -> String -> Bool
-checkExtension ext filename = (reverse ('.':ext)) == (take (length ext + 1) (reverse filename))
+checkExtension ext filename = reverse ('.':ext) == take (length ext + 1) (reverse filename)

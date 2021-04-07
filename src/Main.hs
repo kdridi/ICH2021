@@ -1,25 +1,23 @@
 module Main where
 
-import System.Environment (getArgs)
+import System.Environment ( getArgs )
 
-import ImageParser
-import ImageReader
-import ImageWriter
-
-import Pixel
-import Transformer
+import ImageParser ( parseFile )
+import ImageReader ( readImageFile )
+import ImageWriter ( writeImageFile )
+import Transformer ( transformPixels )
 
 main :: IO ()
 main = do
   args <- getArgs
   case args of
-    pngFilePath:[] -> do
+    [pngFilePath] -> do
       pixels <- readImageFile pngFilePath
-      mapM_ (putStrLn . show) pixels
-    txtFilePath:pngFilePath:[] -> do
+      mapM_ print pixels
+    [txtFilePath,pngFilePath] -> do
       cluster <- parseFile txtFilePath
       let pixels = transformPixels cluster
-      mapM_ (putStrLn . show) pixels
+      mapM_ print pixels
       writeImageFile pixels pngFilePath
     _ -> error "Command not found"
 

@@ -2,19 +2,19 @@ module ImageReader
   ( readImageFile
   ) where
     
-import Control.Applicative
+import Control.Applicative ( Alternative((<|>)) )
 
 import qualified Data.Vector.Storable as VS
 
-import System.Directory (doesFileExist)
+import System.Directory ( doesFileExist )
 
 import qualified Data.ByteString as BS
 
-import qualified Codec.Picture.Jpg as JP (decodeJpeg)
-import qualified Codec.Picture.Png as JP (decodePng)
+import qualified Codec.Picture.Jpg as JP ( decodeJpeg )
+import qualified Codec.Picture.Png as JP ( decodePng )
 import qualified Codec.Picture.Types as JP
 
-import Pixel
+import Pixel ( Pixel(..), Position(..), Color(..) )
 
 readImageFile :: String -> IO [Pixel]
 readImageFile ifn = do
